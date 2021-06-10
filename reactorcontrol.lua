@@ -2,15 +2,12 @@ local r = peripheral.wrap('back')
 local targetWaste = 2000
 local targetSteam = math.floor(r.getHotFluidAmountMax() * 0.5)
 local stopSteam = math.floor(r.getHotFluidAmountMax() * 0.9)
-local active = true
 local prevSteam = -1
+local controlLevel = getMaxControl() - 1
 
 function getMaxControl() 
     return r.getNumberOfControlRods() * 100
 end
-
-local controlRods = getMaxControl() - 1
-
 
 function setControl(val)
     local rods = r.getNumberOfControlRods()
@@ -37,9 +34,9 @@ function display()
     term.write(" C")
     term.setCursorPos(2,4)
     term.write("Activity level: ")
-    local level = (getMaxControl() - controlRods) / r.getNumberOfControlRods()
+    local level = (getMaxControl() - controlLevel) / r.getNumberOfControlRods()
 --    level = r.getActive() and level or 0
-    term.write((getMaxControl() - controlRods) .. "/" .. (getMaxControl()))
+    term.write((getMaxControl() - controlLevel) .. "/" .. (getMaxControl()))
     term.setCursorPos(2,5)
     local efficiency = (r.getHotFluidProducedLastTick() / r.getFuelConsumedLastTick())
     efficiency = r.getActive() and efficiency or 0
@@ -49,18 +46,17 @@ end
 
 while r.getWasteAmount() < (targetWaste - 20) do
   steam = r.getHotFluidAmount() + r.getHotFluidProducedLastTick()
-  if steam < targetSteam and steam <= prevSteam and controlRods > 0 then
-    controlRods = controlRods - 1
+  if steam < targetSteam and steam <= prevSteam and controlLevel > 0 then
+    controlLevel = controlLevel - 1
   end
   
-  if steam > targetSteam and steam >= prevSteam and controlRods < getMaxControl() then
-    controlRods = controlRods + 1
+  if steam > targetSteam and steam >= prevSteam and controlLevel < getMaxControl() then
+    controlLevel = controlLevel + 1
   end
   prevSteam = steam
   
-  active = steam < stopSteam
-  r.setActive(active)
-  setControl(controlRods)
+  r.setActive(steam < stopSteam)
+  setControl(controlLevel)
   display()
   sleep(0.2)
 end

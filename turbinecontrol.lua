@@ -1,4 +1,5 @@
 local t = peripheral.wrap('back')
+local idleFlow = t.getNumberOfBlades()
 local state = {}
 local active = {
     'shutdown',
@@ -38,7 +39,12 @@ function init()
         state.cursor = 1
     else 
         state = {
-            target = {},
+            target = {
+                {
+                    rpm = 0,
+                    flow = 0
+                }
+            },
             active = 1,
             level = 1,
             cursor = 1
@@ -200,32 +206,28 @@ function control()
     while true do
         local rpm = t.getRotorSpeed()
         local targetRPM = state.target[state.level].rpm
-        
+        t.setActive(true)
+
         if state.active == 1 then -- Shutdown mode
             targetFlow = 0
-            --t.setFluidFlowRateMax(0)
-            
             t.setInductorEngaged(true)
-            t.setActive(true)
         end
         if state.active == 2 then -- Idle mode
-            t.setActive(true)
             t.setInductorEngaged(false)
 
             if rpm < (targetRPM - 10) then
-                targetFlow = 5 * state.level
+                targetFlow = idleFlow
             end
             if rpm > (targetRPM + 10) then 
                 targetFlow = 0
             end
         end
         if state.active == 3 then -- Online mode
-            t.setActive(true)
-            if rpm < (targetRPM + 200) then
+            if rpm < (targetRPM + 20) then
                 targetFlow = state.target[state.level].flow
                 -- t.setFluidFlowRateMax(targetFlow)
             else
-                targetFlow = 0
+                targetFlow = math.max(0, (state.target[state.level].flow - (rpm - (targetRPM + 20))))
             end
             if rpm < (targetRPM - 1) then
                 t.setInductorEngaged(false)
