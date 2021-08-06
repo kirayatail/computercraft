@@ -1,4 +1,4 @@
---1
+--2
 local t = peripheral.wrap('back')
 local state = {}
 local socket = nil
@@ -323,4 +323,15 @@ function flowUpdate()
 end
 
 init()
-parallel.waitForAll(keyListener, control, flowUpdate, socket and socket.runtime)
+
+local loops = {
+    keyListener,
+    control,
+    flowUpdate
+}
+
+if socket then
+    table.insert(loops, socket.runtime)
+end
+
+parallel.waitForAll(unpack(loops))
