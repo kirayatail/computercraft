@@ -1,11 +1,21 @@
+--1
 local t = peripheral.wrap('back')
-local idleFlow = t.getNumberOfBlades()
 local state = {}
+local socket = nil
 local active = {
     'shutdown',
     'idle',
     'online'
 }
+
+local function indexOf(tbl, val)
+    local index = {}
+    for k,v in pairs(tbl) do
+        index[v] = k
+    end
+    return index[val]
+end
+
 local options = {
     {
         name = 'state',
@@ -51,6 +61,50 @@ function init()
         }
         writeState()
     end
+    if fs.exists('websocket.lua') then
+        socket = require('websocket');
+    end
+end
+
+function sendMethods()
+    if socket then
+        socket.methods({
+            {
+                type='radio',
+                key= 'state',
+                name = 'Power',
+                options = {'online', 'idle', 'shutdown'},
+                value = active[state.active],
+                fn = function(value)
+                    state.active = indexOf(active, value)
+                    writeState()
+                    return value
+                end
+            },
+            {
+                type ='number',
+                key ='speed',
+                name = 'RPM',
+                value = state.target[state.level]['rpm'],
+                fn = function(value)
+                    state.target[state.level]['rpm'] = value
+                    writeState()
+                    return value
+                end
+            },
+            {
+                type ='number',
+                key ='flow',
+                name = 'Steam',
+                value = state.target[state.level]['flow'],
+                fn = function(value)
+                    state.target[state.level]['flow'] = value
+                    writeState()
+                    return value
+                end
+            }
+        })
+    end
 end
 
 function writeState()
@@ -60,32 +114,40 @@ function writeState()
 end
 
 function keyListener()
-   while true do 
-       local event, key = os.pullEvent('key')
-       if key <= keys.nine and key >= keys.one then
-           state.level = key - keys.one + 1
-           if state.target[state.level] == nil then
-               state.target[state.level] = {
-                   rpm = 0,
-                   flow = 0
-               }
-           end
-       end
-       if key == keys.up then
-           increase()
-       end
-       if key == keys.down then
-           decrease()
-       end
-       if key == keys.left then
-           back()
-       end 
-       if key == keys.right then
-           forward()
-       end
-       writeState()
-       display()
-   end
+    while true do 
+        local event, key = os.pullEvent('key')
+        if key <= keys.nine and key >= keys.one then
+            state.level = key - keys.one + 1
+            if state.target[state.level] == nil then
+                state.target[state.level] = {
+                    rpm = 0,
+                    flow = 0
+                }
+            end
+        end
+        if key == keys.up then
+            increase()
+        end
+        if key == keys.down then
+            decrease()
+        end
+        if key == keys.left then
+            back()
+        end 
+        if key == keys.right then
+            forward()
+        end
+        if key == keys.enter and socket then
+            if not socket.isConnected() then
+                socket.connect('turbine')
+            else
+                socket.disconnect()
+            end
+        end
+        writeState()
+        sendMethods()
+        display()
+    end
 end
 
 function increase() 
@@ -167,11 +229,23 @@ function displayInfo()
     term.setCursorPos(6, 11)
     term.write(string.format("RF/mB: %1.2f", efficiency))
     term.setCursorPos(6, 13)
-    term.write(string.format("Blades: %1.2f%%", bladeEfficiency))
+    term.write(string.format("Target flow: %d", targetFlow))
     if storage > 2 * rf then
         term.setCursorPos(26, 5)
         term.write("WARNING! Storing energy!")
     end
+    term.setCursorPos(26, 7)
+    if socket then
+        if socket.isConnected() then
+            term.write('Websocket ID: '..socket.id())
+        else
+            term.write('Websocket available')
+            term.setCursorPos(26, 9)
+            term.write('Press Enter to connect')
+        end
+    end
+
+
 end
 
 function displayOptions() 
@@ -202,6 +276,11 @@ function display()
     displayOptions()
 end
 
+function flowCalc(target, targetRPM, rpm) 
+    local maxFlow = t.getNumberOfBlades() * 25
+    return math.max(0, math.min(maxFlow, target + math.floor((targetRPM - rpm) * 2)))
+end
+
 function control()
     while true do
         local rpm = t.getRotorSpeed()
@@ -214,21 +293,11 @@ function control()
         end
         if state.active == 2 then -- Idle mode
             t.setInductorEngaged(false)
-
-            if rpm < (targetRPM - 10) then
-                targetFlow = idleFlow
-            end
-            if rpm > (targetRPM + 10) then 
-                targetFlow = 0
-            end
+            targetFlow = flowCalc(0, targetRPM, rpm)
         end
         if state.active == 3 then -- Online mode
-            if rpm < (targetRPM + 20) then
-                targetFlow = state.target[state.level].flow
-                -- t.setFluidFlowRateMax(targetFlow)
-            else
-                targetFlow = math.max(0, (state.target[state.level].flow - (rpm - (targetRPM + 20))))
-            end
+            targetFlow = flowCalc(state.target[state.level].flow, targetRPM, rpm)
+            
             if rpm < (targetRPM - 1) then
                 t.setInductorEngaged(false)
             end
@@ -254,4 +323,4 @@ function flowUpdate()
 end
 
 init()
-parallel.waitForAll(keyListener, control, flowUpdate)
+parallel.waitForAll(keyListener, control, flowUpdate, socket and socket.runtime)
