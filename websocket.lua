@@ -1,4 +1,4 @@
---1
+--2
 function S()
     local conf = {}
     local socket = nil
@@ -38,6 +38,12 @@ function S()
             end
             if m.options then 
                 obj['options'] = m.options
+            end
+            if m.min then
+                obj['min'] = m.min
+            end
+            if m.max then
+                obj['max'] = m.max
             end
             return obj
         end)

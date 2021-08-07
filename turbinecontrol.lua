@@ -1,4 +1,4 @@
---2
+--3
 local t = peripheral.wrap('back')
 local state = {}
 local socket = nil
@@ -85,6 +85,8 @@ function sendMethods()
                 type ='number',
                 key ='speed',
                 name = 'RPM',
+                min = 0,
+                max = 10000,
                 value = state.target[state.level]['rpm'],
                 fn = function(value)
                     state.target[state.level]['rpm'] = value
@@ -96,6 +98,8 @@ function sendMethods()
                 type ='number',
                 key ='flow',
                 name = 'Steam',
+                min = 0,
+                max = 2000,
                 value = state.target[state.level]['flow'],
                 fn = function(value)
                     state.target[state.level]['flow'] = value

@@ -1,3 +1,4 @@
+--1
 local r = peripheral.wrap('back')
 local targetWaste = 2000
 local targetSteam = math.floor(r.getHotFluidAmountMax() * 0.5)
