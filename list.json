@@ -1,14 +1,1 @@
-[
-    {
-        "name": "turbinecontrol.lua",
-        "version": 3
-    },
-    {
-        "name": "websocket.lua",
-        "version": 2
-    },
-    {
-        "name": "reactorcontrol.lua",
-        "version": 1
-    }
-]
+[{"name":"installer.lua","version":1},{"name":"reactorcontrol.lua","version":1},{"name":"turbinecontrol.lua","version":3},{"name":"websocket.lua","version":2}]
