@@ -21,7 +21,7 @@ if (correctUpdate) {
   fs.writeFileSync('./list.json', JSON.stringify(
     oldList.reduce((newList, oldFile) => {
       return (newList.find(f => f.name === oldFile.name)) ? newList : newList.concat([oldFile]);
-    }, newFiles)
+    }, newFiles).sort((a,b) => (a.name > b.name) ? 1 : (a.name < b.name) ? -1 : 0)
   ));
   process.exit(0);
 } else {
