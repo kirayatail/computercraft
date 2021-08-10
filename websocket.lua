@@ -1,4 +1,4 @@
---2
+--3
 function S()
     local conf = {}
     local socket = nil
@@ -50,12 +50,16 @@ function S()
     end
 
     local function saveConf()
-        local file = fs.open('websocket.conf', 'w')
+        local file = fs.open('var/websocket.conf', 'w')
         file.write(textutils.serialise(conf))
         file.close()
     end
 
-    if fs.exists('websocket.conf') then
+    if not fs.exists('var/websocket.conf') and fs.exists('websocket.conf') then
+       move('websocket.conf', 'var/websocket.conf') 
+    end
+
+    if fs.exists('var/websocket.conf') then
         local file = fs.open('websocket.conf', 'r')
         conf = textutils.unserialise(file.readAll())
         file.close()

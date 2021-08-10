@@ -1,4 +1,4 @@
---3
+--4
 local t = peripheral.wrap('back')
 local state = {}
 local socket = nil
@@ -42,8 +42,11 @@ local targetFlow = 0
 
 
 function init() 
-    if fs.exists('turbineState.tbl') then
-        stateFile = fs.open('turbineState.tbl', 'r')
+    if fs.exists('turbineState.tbl') and not fs.exists('var/turbineState.tbl') then
+        fs.move('turbineState.tbl', 'var/turbineState.tbl')
+    end
+    if fs.exists('var/turbineState.tbl') then
+        stateFile = fs.open('var/turbineState.tbl', 'r')
         state = textutils.unserialise(stateFile.readAll())
         stateFile.close()
         state.cursor = 1
@@ -112,7 +115,7 @@ function sendMethods()
 end
 
 function writeState()
-    stateFile = fs.open('turbineState.tbl', 'w')
+    stateFile = fs.open('var/turbineState.tbl', 'w')
     stateFile.write(textutils.serialise(state))
     stateFile.close()
 end
