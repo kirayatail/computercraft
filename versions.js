@@ -1,7 +1,6 @@
 const fs = require('fs');
 
 const oldList = JSON.parse(fs.readFileSync('./list.json', 'utf8'))
-console.log('args', process.argv)
 
 const newFiles = process.argv.slice(2).filter(n => (/\.lua$/).test(n))
 .map(filename => {
@@ -11,8 +10,6 @@ const newFiles = process.argv.slice(2).filter(n => (/\.lua$/).test(n))
     version
   }
 });
-
-console.log(newFiles);
 
 const correctUpdate = newFiles.every(newFile => {
   const oldFile = oldList.find(f => f.name === newFile.name);
@@ -26,8 +23,8 @@ if (correctUpdate) {
       return (newList.find(f => f.name === oldFile.name)) ? newList : newList.concat([oldFile]);
     }, newFiles)
   ));
-  return 0;
+  process.exit(0);
 } else {
   console.error('File versions must be updated')
-  return 1;
+  process.exit(1);
 }

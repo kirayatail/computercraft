@@ -1,4 +1,4 @@
---2
+--3
 local r = peripheral.wrap('back')
 local targetWaste = 2000
 local targetSteam = math.floor(r.getHotFluidAmountMax() * 0.5)
@@ -10,10 +10,10 @@ function getMaxControl()
 end
 
 function getControl()
-  local rods = r.getNumberOfControlRods()
+  local rods = r.getControlRodsLevels()
   local level = 0
-  for i = 0, rods do
-    level = level + r.getControlRodLevel(i)
+  for k,v in rods do
+    level = level + v
   end
   return level
 end
