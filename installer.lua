@@ -1,4 +1,4 @@
---2
+--3
 local url = 'https://raw.githubusercontent.com/kirayatail/computercraft/master/'
 local fileList = {}
 local offset = 0
@@ -96,7 +96,7 @@ function keyListener()
         if key == keys.i or key == keys.enter then
             install(cursor)
         end
-        if key == keys.u or then
+        if key == keys.u then
             update()
         end
         if key == keys.r or key == keys.delete then
