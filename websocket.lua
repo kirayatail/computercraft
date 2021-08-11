@@ -1,4 +1,4 @@
---4
+--5
 function S()
     local conf = {}
     local socket = nil
@@ -60,7 +60,7 @@ function S()
     end
 
     if fs.exists('var/websocket.conf') then
-        local file = fs.open('websocket.conf', 'r')
+        local file = fs.open('var/websocket.conf', 'r')
         conf = textutils.unserialise(file.readAll())
         file.close()
     end
