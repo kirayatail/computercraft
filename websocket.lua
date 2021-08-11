@@ -1,4 +1,4 @@
---3
+--4
 function S()
     local conf = {}
     local socket = nil
@@ -56,7 +56,7 @@ function S()
     end
 
     if not fs.exists('var/websocket.conf') and fs.exists('websocket.conf') then
-       move('websocket.conf', 'var/websocket.conf') 
+       fs.move('websocket.conf', 'var/websocket.conf') 
     end
 
     if fs.exists('var/websocket.conf') then
