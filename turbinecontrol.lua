@@ -1,4 +1,4 @@
---5
+--6
 local t = nil
 local state = {}
 local socket = nil
@@ -65,7 +65,7 @@ function init()
     if state.portSide == nil then
         setPortSide()
     end
-    t = peripheral.wrap('back')
+    t = peripheral.wrap(state.portSide)
     actFlow = t.getFluidFlowRateMax()
     
 
