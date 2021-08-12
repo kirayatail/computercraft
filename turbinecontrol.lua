@@ -1,4 +1,4 @@
---6
+--7
 local t = nil
 local state = {}
 local socket = nil
@@ -337,7 +337,7 @@ end
 
 function flowCalc(target, targetRPM, rpm) 
     local maxFlow = t.getNumberOfBlades() * 25
-    local rampFactor = 0.035 * t.getNumberOfBlades() + 0.2
+    local rampFactor = 0.025 * t.getNumberOfBlades() + 0.1
     return math.max(0, math.min(maxFlow, target + math.floor((targetRPM - rpm) * rampFactor)))
 end
 
