@@ -1,5 +1,5 @@
---4
-local t = peripheral.wrap('back')
+--5
+local t = nil
 local state = {}
 local socket = nil
 local active = {
@@ -7,6 +7,8 @@ local active = {
     'idle',
     'online'
 }
+local actFlow = nil
+local targetFlow = 0
 
 local function indexOf(tbl, val)
     local index = {}
@@ -37,10 +39,6 @@ local options = {
     }
 }
 
-local actFlow = t.getFluidFlowRateMax()
-local targetFlow = 0
-
-
 function init() 
     if fs.exists('turbineState.tbl') and not fs.exists('var/turbineState.tbl') then
         fs.move('turbineState.tbl', 'var/turbineState.tbl')
@@ -64,9 +62,24 @@ function init()
         }
         writeState()
     end
+    if state.portSide == nil then
+        setPortSide()
+    end
+    t = peripheral.wrap('back')
+    actFlow = t.getFluidFlowRateMax()
+    
+
     if fs.exists('websocket.lua') then
         socket = require('websocket');
     end
+end
+
+function setPortSide()
+    term.clear()
+    print('Which side is the port on?')
+    state.portSide = read()
+    writeState()
+    term.clear()
 end
 
 function sendMethods()
@@ -109,6 +122,44 @@ function sendMethods()
                     writeState()
                     return value
                 end
+            }
+        })
+    end
+end
+
+function sendInfo()
+    if socket then
+        local rf = t.getEnergyProducedLastTick()
+        local flow = t.getFluidFlowRate()
+        local efficiency = 0
+        if rf > 0 and flow > 0 then
+            efficiency = rf / flow
+        end
+        socket.info({
+            {
+                key = 'RF',
+                value = rf,
+                type= 'number'
+            },
+            {
+                key = 'RPM',
+                value = t.getRotorSpeed(),
+                type = 'number'
+            },
+            {
+                key = 'Efficiency',
+                value = efficiency,
+                type =  'number'
+            },
+            {
+                key = 'Low Flow',
+                value = flow < actFlow,
+                type = 'warning'
+            },
+            {
+                key = 'Storing energy',
+                value = t.getEnergyStored() > 10000,
+                type = 'warning'
             }
         })
     end
@@ -281,11 +332,13 @@ function display()
     displayLevel()
     displayInfo()
     displayOptions()
+    sendInfo()
 end
 
 function flowCalc(target, targetRPM, rpm) 
     local maxFlow = t.getNumberOfBlades() * 25
-    return math.max(0, math.min(maxFlow, target + math.floor((targetRPM - rpm) * 2)))
+    local rampFactor = 0.035 * t.getNumberOfBlades() + 0.2
+    return math.max(0, math.min(maxFlow, target + math.floor((targetRPM - rpm) * rampFactor)))
 end
 
 function control()
@@ -308,7 +361,7 @@ function control()
             if rpm < (targetRPM - 1) then
                 t.setInductorEngaged(false)
             end
-            if rpm > (targetRPM + 1) then 
+            if rpm >= targetRPM then 
                 t.setInductorEngaged(true)
             end
         end

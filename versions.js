@@ -17,7 +17,7 @@ const correctUpdate = newFiles.every(newFile => {
 });
 
 if (correctUpdate) {
-  console.log(`Updating ${newFiles.length} file records`);
+  console.log(`Updating ${newFiles.length} file record${newFiles.length === 1 ? '' : 's'}`);
   fs.writeFileSync('./list.json', JSON.stringify(
     oldList.reduce((newList, oldFile) => {
       return (newList.find(f => f.name === oldFile.name)) ? newList : newList.concat([oldFile]);
