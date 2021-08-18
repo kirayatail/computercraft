@@ -1,4 +1,4 @@
---4
+--5
 local url = 'https://raw.githubusercontent.com/kirayatail/computercraft/master/'
 local fileList = {}
 local offset = 0
@@ -84,8 +84,15 @@ function displayPocket()
             local file = fileList[line + offset]
             term.setCursorPos(3, line*2 + 1)
             term.write(file.name)
-            term.setCursorPos(3, line*2 + 2)
-            term.write(string.format("Version: %d Local: %d", file.version, file.localVersion or ""))
+            term.setCursorPos(4, line*2 + 2)
+            term.setBackgroundColor(colors.white)
+            term.setTextColor(colors.black)
+            term.write(string.format("Version: %d ", file.version))
+            if file.localVersion then 
+                term.write(string.format("Local: %d", file.localVersion))
+            end
+            term.setBackgroundColor(colors.black)
+            term.setTextColor(colors.white)
         end
     end
     term.setCursorPos(1, 20)
