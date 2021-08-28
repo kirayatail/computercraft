@@ -1,5 +1,5 @@
 # computercraft
-This is a collection of programs - applications and APIs, that I use with ComputerCraft or Tweaked:CC and modded Minecraft.
+This is a collection of programs - applications and APIs, that I use with ComputerCraft or CC:Tweaked and modded Minecraft.
 
 ## How to install
 This collection comes with an in-game installer/package manager, so that you easily can install, update and uninstall programs from within ComputerCraft.
@@ -15,4 +15,4 @@ for any damage the software or the usage thereof might cause.
 
 ## Feature requests & Bugs
 Please post feature requests and bug reports to the [Issues](https://github.com/kirayatail/computercraft/issues) board. Remember that this project is only concerning
-code that runs inside the ComputerCraft/Tweaked:CC mod, and any effects on other mods or Minecraft as such it may have, is well beyond the scope.
+code that runs inside the ComputerCraft/CC:Tweaked mod, and any effects on other mods or Minecraft as such it may have, is well beyond the scope.
