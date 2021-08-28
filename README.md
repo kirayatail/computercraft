@@ -3,7 +3,11 @@ This is a collection of programs - applications and APIs, that I use with Comput
 
 ## How to install
 This collection comes with an in-game installer/package manager, so that you easily can install, update and uninstall programs from within ComputerCraft.
-Start a CC computer, then run the command `wget https://raw.githubusercontent.com/kirayatail/computercraft/master/installer.lua` to download the installer directly from here.
+Start a CC computer, then run the command 
+```
+wget https://raw.githubusercontent.com/kirayatail/computercraft/master/installer.lua
+``` 
+to download the installer directly from here.
 After that, just run the installer program on the CC computer and choose the programs you like from there.
 
 ## Further information
