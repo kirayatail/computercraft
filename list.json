@@ -1,1 +1,1 @@
-[{"name":"installer.lua","version":7},{"name":"reactorcontrol.lua","version":4},{"name":"turbinecontrol.lua","version":7},{"name":"websocket.lua","version":7}]
+[{"name":"batmon.lua","version":1},{"name":"installer.lua","version":7},{"name":"reactorcontrol.lua","version":4},{"name":"turbinecontrol.lua","version":8},{"name":"websocket.lua","version":7}]

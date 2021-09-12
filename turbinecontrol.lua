@@ -1,4 +1,4 @@
---7
+--8
 local t = nil
 local state = {}
 local socket = nil
@@ -86,6 +86,17 @@ function sendMethods()
     if socket then
         socket.methods({
             {
+                type='dropdown',
+                key='preset',
+                name='Preset',
+                options={1,2,3,4,5,6,7,8,9},
+                value=state.level,
+                fn = function(value)
+                    state.level = value
+                    sendMethods()
+                end
+            },
+            {
                 type='radio',
                 key= 'state',
                 name = 'Power',
@@ -137,14 +148,14 @@ function sendInfo()
         end
         socket.info({
             {
-                key = 'RF',
-                value = rf,
-                type= 'number'
-            },
-            {
                 key = 'RPM',
                 value = t.getRotorSpeed(),
                 type = 'number'
+            },
+            {
+                key = 'RF',
+                value = rf,
+                type= 'number'
             },
             {
                 key = 'Efficiency',
