@@ -1,4 +1,4 @@
---7
+--8
 function S()
     local conf = {}
     local socket = nil
@@ -7,13 +7,14 @@ function S()
     local state = {
         group = nil,
         hidden = false,
-        info = {},
-        methods = {}
+        info = nil,
+        methods = nil
     }
     local reconnect = false
     local printVerbose = false
 
     local function map(tbl, f)
+        if tbl == nil then return nil end
         local t = {}
         for k,v in pairs(tbl) do
             t[k] = f(v)

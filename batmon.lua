@@ -1,4 +1,4 @@
---1
+--2
 local socket = nil
 local conf = {}
 local bats = { peripheral.find('thermalexpansion:storage_cell') }
@@ -43,6 +43,8 @@ end
 
 function start()
     if socket then
+        socket.group(conf.group or nil)
+        socket.hidden(conf.hidden or false)
         socket.connect('batmon', true)
     end
 end
@@ -68,6 +70,7 @@ function monitor()
     end
 end
 
+init()
 local loops = {
     start, monitor
 }
