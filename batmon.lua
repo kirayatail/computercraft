@@ -1,4 +1,4 @@
---3
+--4
 local socket = nil
 local conf = {}
 local total = 0
@@ -65,7 +65,7 @@ function monitor()
                 },
                 {
                     key = 'percent',
-                    value = stored * 100 / total,
+                    value = total > 0 and (stored * 100 / total) or 0,
                     type = 'number'
                 }
             })
