@@ -1,4 +1,4 @@
---6
+--7
 function S()
     local conf = {}
     local socket = nil
@@ -28,17 +28,6 @@ function S()
         return nil
     end
 
-    local function all()
-        return {
-            id = id,
-            type = computerType,
-            info = state['info'],
-            methods = clean(state['methods']),
-            group = state['group'],
-            hidden = state['hidden'],
-        }
-    end
-
     local function clean(tbl) 
         return map(tbl, function (m)
             local obj = {
@@ -62,6 +51,17 @@ function S()
             end
             return obj
         end)
+    end
+
+    local function all()
+        return {
+            id = id,
+            type = computerType,
+            info = state['info'],
+            methods = clean(state['methods']),
+            group = state['group'],
+            hidden = state['hidden'],
+        }
     end
 
     local function saveConf()
