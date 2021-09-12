@@ -1,11 +1,15 @@
---5
+--6
 function S()
     local conf = {}
     local socket = nil
     local id = nil
     local computerType = nil
-    local info = {}
-    local methods = {}
+    local state = {
+        group = nil,
+        hidden = false,
+        info = {},
+        methods = {}
+    }
     local reconnect = false
     local printVerbose = false
 
@@ -22,6 +26,17 @@ function S()
             if f(v) then return tbl[k], k end
         end
         return nil
+    end
+
+    local function all()
+        return {
+            id = id,
+            type = computerType,
+            info = state['info'],
+            methods = clean(state['methods']),
+            group = state['group'],
+            hidden = state['hidden'],
+        }
     end
 
     local function clean(tbl) 
@@ -76,10 +91,11 @@ function S()
         saveConf()
     end
 
-    function connect(type)
+    function connect(type, recon)
         if socket and id then
             disconnect()
         end
+        reconnect = recon
         computerType = type or 'computer'
         http.websocketAsync(conf.address)
     end
@@ -93,25 +109,19 @@ function S()
         end
     end
 
-    function info(data)
-        info = data
-        if socket and id then
-            socket.send(textutils.serialiseJSON({
-                type = 'info',
-                id = id,
-                payload = info
-            }));
-        end
-    end
-
-    function methods(data)
-        methods = data
-        if socket and id then
-            socket.send(textutils.serialiseJSON({
-                type = 'methods',
-                id = id,
-                payload = clean(methods)
-            }));
+    function sendState(type)
+        return function(data)
+            if type == 'methods' then
+                data = clean(data)
+            end
+            state[type] = data
+            if socket and id then
+                socket.send(textutils.serialiseJSON({
+                    type = type,
+                    id = id,
+                    payload = state[type]
+                }));
+            end    
         end
     end
 
@@ -137,10 +147,18 @@ function S()
                 }))
             end
             if eventData[1] == 'websocket_failure' then
+                if reconnect then 
+                    sleep(5)
+                    connect(computerType, true)
+                end
             end
             if eventData[1] == 'websocket_closed' then
                 id = nil
                 socket = nil
+                if reconnect then 
+                    sleep(5)
+                    connect(computerType, true)
+                end
             end
             if eventData[1] == 'websocket_message' then
                 local message = textutils.unserialiseJSON(eventData[3])
@@ -150,21 +168,21 @@ function S()
                 if message.type == 'handshake' then
                     id = message.id
                     socket.send(textutils.serialiseJSON({
-                        type = 'methods', id = id,
-                        payload = clean(methods)
+                        type = 'all', id = id,
+                        payload = all()
                     }))
                 end
                 if message.type == 'command' then
-                    local m,i = find(methods, function(m) return m.key == message.payload.key end)
+                    local m,i = find(state['methods'], function(m) return m.key == message.payload.key end)
                     if m.type == 'void' then
                         m.fn()
                     else
                         local res = m.fn(message.payload.value)
                         if res ~= nil then
-                            methods[i].value = res
+                            state['methods'][i].value = res
                             socket.send(textutils.serialiseJSON({
                                 type = 'methods', id = id,
-                                payload = clean(methods)
+                                payload = clean(state['methods'])
                             }))
                         end
                     end
@@ -175,10 +193,12 @@ function S()
     return {
         connect = connect,
         disconnect = disconnect,
+        group = sendState('group'),
+        hidden = sendState('hidden'),
         id = id,
-        info = info,
+        info = sendState('info'),
         isConnected = isConnected,
-        methods = methods,
+        methods = sendState('methods'),
         runtime = socketRuntime,
         verbose = verbose
     }
