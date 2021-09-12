@@ -1,7 +1,6 @@
---2
+--3
 local socket = nil
 local conf = {}
-local bats = { peripheral.find('thermalexpansion:storage_cell') }
 local total = 0
 
 local function map(tbl, f)
@@ -37,8 +36,6 @@ function init()
     if fs.exists('websocket.lua') then 
         socket = require('websocket')
     end
-
-    total = sum(map(bats, function(b) return b.getRFCapacity() end)) / 1000
 end
 
 function start()
@@ -51,17 +48,24 @@ end
 
 function monitor()
     while true do
-        local value = sum(map(bats, function(b) return b.getRFStored() end)) / 1000
+        local bats = { peripheral.find('thermalexpansion:storage_cell') }
+        local stored = sum(map(bats, function(b) return b.getRFStored() end)) / 1000
+        local total = sum(map(bats, function(b) return b.getRFCapacity() end)) / 1000
         if socket then
             socket.info({
                 {
                     key = 'stored',
-                    value = value,
+                    value = stored,
                     type = 'number'
                 },
                 {
                     key = 'total',
                     value = total,
+                    type = 'number'
+                },
+                {
+                    key = 'percent',
+                    value = stored * 100 / total,
                     type = 'number'
                 }
             })
