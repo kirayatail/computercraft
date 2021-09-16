@@ -1,4 +1,4 @@
---9
+--10
 function S()
     local conf = {}
     local socket = nil
@@ -110,17 +110,17 @@ function S()
         end
     end
 
-    function sendState(type)
+    function sendState(t)
         return function(data)
-            state[type] = data
-            if type == 'methods' then
+            state[t] = data
+            if t == 'methods' then
                 data = clean(data)
             end
             if socket and id then
                 socket.send(textutils.serialiseJSON({
-                    type = type,
+                    type = t,
                     id = id,
-                    payload = state[type]
+                    payload = state[t]
                 }));
             end    
         end

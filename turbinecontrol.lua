@@ -1,4 +1,4 @@
---8
+--9
 local t = nil
 local state = {}
 local socket = nil
@@ -92,7 +92,7 @@ function sendMethods()
                 options={1,2,3,4,5,6,7,8,9},
                 value=state.level,
                 fn = function(value)
-                    state.level = value
+                    state.level = toNumber(value)
                     sendMethods()
                 end
             },
