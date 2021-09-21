@@ -1,4 +1,4 @@
---10
+--11
 function S()
     local conf = {}
     local socket = nil
@@ -92,12 +92,12 @@ function S()
         saveConf()
     end
 
-    function connect(type, recon)
+    function connect(tp, recon)
         if socket and id then
             disconnect()
         end
         reconnect = recon
-        computerType = type or 'computer'
+        computerType = tp or 'computer'
         http.websocketAsync(conf.address)
     end
 
@@ -120,7 +120,7 @@ function S()
                 socket.send(textutils.serialiseJSON({
                     type = t,
                     id = id,
-                    payload = state[t]
+                    payload = data
                 }));
             end    
         end

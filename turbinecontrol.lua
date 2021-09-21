@@ -1,4 +1,4 @@
---9
+--10
 local t = nil
 local state = {}
 local socket = nil
@@ -82,6 +82,16 @@ function setPortSide()
     term.clear()
 end
 
+function setLevel(l)
+    state.level = tonumber(l)
+    if state.target[state.level] == nil then
+        state.target[state.level] = {
+            rpm = 0,
+            flow = 0
+        }
+    end
+end
+
 function sendMethods()
     if socket then
         socket.methods({
@@ -92,7 +102,8 @@ function sendMethods()
                 options={1,2,3,4,5,6,7,8,9},
                 value=state.level,
                 fn = function(value)
-                    state.level = toNumber(value)
+                    setLevel(value)
+                    writeState()
                     sendMethods()
                 end
             },
@@ -186,13 +197,7 @@ function keyListener()
     while true do 
         local event, key = os.pullEvent('key')
         if key <= keys.nine and key >= keys.one then
-            state.level = key - keys.one + 1
-            if state.target[state.level] == nil then
-                state.target[state.level] = {
-                    rpm = 0,
-                    flow = 0
-                }
-            end
+            setLevel(key - keys.one + 1)            
         end
         if key == keys.up then
             increase()
