@@ -1,4 +1,4 @@
---10
+--11
 local t = nil
 local state = {}
 local socket = nil
@@ -213,7 +213,7 @@ function keyListener()
         end
         if key == keys.enter and socket then
             if not socket.isConnected() then
-                socket.connect('turbine')
+                socket.connect('turbine', true)
             else
                 socket.disconnect()
             end
