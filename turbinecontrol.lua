@@ -1,4 +1,4 @@
---11
+--12
 local t = nil
 local state = {}
 local socket = nil
@@ -127,6 +127,12 @@ function sendMethods()
                 max = 10000,
                 value = state.target[state.level]['rpm'],
                 fn = function(value)
+                    if value == nil or value < 0 then
+                        value = 0
+                    end
+                    if value > 10000 then
+                        value = 10000
+                    end
                     state.target[state.level]['rpm'] = value
                     writeState()
                     return value
@@ -140,6 +146,12 @@ function sendMethods()
                 max = 2000,
                 value = state.target[state.level]['flow'],
                 fn = function(value)
+                    if value == nil or value < 0 then
+                        value = 0
+                    end
+                    if value > 2000 then
+                        value = 2000
+                    end
                     state.target[state.level]['flow'] = value
                     writeState()
                     return value
