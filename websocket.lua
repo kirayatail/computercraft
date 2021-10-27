@@ -1,8 +1,8 @@
---11
+--12
 function S()
     local conf = {}
     local socket = nil
-    local id = nil
+    local computerId = nil
     local computerType = nil
     local state = {
         group = nil,
@@ -56,7 +56,7 @@ function S()
 
     local function all()
         return {
-            id = id,
+            id = computerId,
             type = computerType,
             info = state['info'],
             methods = clean(state['methods']),
@@ -93,7 +93,7 @@ function S()
     end
 
     function connect(tp, recon)
-        if socket and id then
+        if socket and computerId then
             disconnect()
         end
         reconnect = recon
@@ -102,10 +102,10 @@ function S()
     end
 
     function disconnect()
-        if socket and id then
+        if socket and computerId then
             socket.close()
             socket = nil
-            id = nil
+            computerId = nil
             reconnect = false
         end
     end
@@ -119,7 +119,7 @@ function S()
             if socket and id then
                 socket.send(textutils.serialiseJSON({
                     type = t,
-                    id = id,
+                    id = computerId,
                     payload = data
                 }));
             end    
@@ -135,7 +135,7 @@ function S()
     end
 
     function id()
-        return id
+        return computerId
     end
 
     function socketRuntime()
@@ -154,7 +154,7 @@ function S()
                 end
             end
             if eventData[1] == 'websocket_closed' then
-                id = nil
+                computerId = nil
                 socket = nil
                 if reconnect then 
                     sleep(5)
@@ -167,9 +167,9 @@ function S()
                     print(eventData[3])
                 end
                 if message.type == 'handshake' then
-                    id = message.id
+                    computerId = message.id
                     socket.send(textutils.serialiseJSON({
-                        type = 'all', id = id,
+                        type = 'all', id = computerId,
                         payload = all()
                     }))
                 end
@@ -182,7 +182,7 @@ function S()
                         if res ~= nil then
                             state['methods'][i].value = res
                             socket.send(textutils.serialiseJSON({
-                                type = 'methods', id = id,
+                                type = 'methods', id = computerId,
                                 payload = clean(state['methods'])
                             }))
                         end
