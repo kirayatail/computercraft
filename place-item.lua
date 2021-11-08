@@ -1,4 +1,10 @@
 --1
+-- This program should be run by a turtle which is equipped with a pickaxe or other tool that allows it to perform dig().
+-- It will detect if there's a block placed in front of it, and alternate between mining that block and placing it back.
+-- Useful example: Place in front of a power line and use this program as a connection switch.
+-- Configuration: First time use will create a default configuration file at /var/place-item.conf. 
+-- Modify this file to set the name of the turtle and the action it performs.
+
 local ws = require('websocket')
 local conf = {}
 
