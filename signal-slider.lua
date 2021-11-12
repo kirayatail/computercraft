@@ -1,4 +1,4 @@
---1
+--2
 local ws = require('websocket')
 local conf = {}
 local sides = {
@@ -12,8 +12,9 @@ function setSides(count)
 end
 
 function init()
-    if fs.exists('var/tri-signal.conf') then
-        local file = fs.open('var/tri-signal.conf', 'r')
+    local filename = 'var/signal.conf'
+    if fs.exists(filename) then
+        local file = fs.open(filename, 'r')
         conf = textutils.unserialise(file.readAll())
         file.close()
     else
@@ -22,7 +23,7 @@ function init()
             computerName = 'Signal slider',
             methodKey = 'Level'
         }
-        local file = fs.open('var/tri-signal.conf', 'w')
+        local file = fs.open(filename, 'w')
         file.write(textutils.serialise(conf))
         file.close()
     end
@@ -34,7 +35,7 @@ function init()
             min = 0,
             max = table.getn(conf.sides),
             fn = function (level)
-                setSides(level)
+                setSides(tonumber(level))
                 return level
             end
         }
