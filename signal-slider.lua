@@ -1,14 +1,22 @@
---2
+--3
 local ws = require('websocket')
 local conf = {}
-local sides = {
-    "left", "right", "back"
-}
+local localLevel = 0
+
 
 function setSides(count)
+    if count > table.getn(conf.sides) then
+        count = table.getn(conf.sides)
+    end
+    if count < 0 then 
+        count = 0
+    end
+    localLevel = count
     for i = 1, table.getn(conf.sides) do
         redstone.setOutput(conf.sides[i], i <= count)
     end
+    sendMethods()
+    display()
 end
 
 function init()
@@ -27,21 +35,56 @@ function init()
         file.write(textutils.serialise(conf))
         file.close()
     end
+    display()
+    ws.connect(conf.computerName, true)
+    sendMethods()
+end
+
+function sendMethods() 
     ws.methods({
         {
             type = "slider",
             key = conf.methodKey,
-            value = 0,
+            value = localLevel,
             min = 0,
             max = table.getn(conf.sides),
             fn = function (level)
                 setSides(tonumber(level))
-                return level
             end
         }
     })
 end
 
+function keyListener()
+    local running = true
+    while running do
+        local evt, key = os.pullEvent('key')
+        if key == keys.up then
+            setSides(localLevel + 1)
+        end
+        if key == keys.down then
+            setSides(localLevel - 1)
+        end
+        if key == keys.q then
+            running = false
+        end
+    end
+    ws.disconnect()
+    term.clear()
+end
+
+function display()
+    term.clear()
+    term.setCursorPos(2, 2)
+    term.write('Signal Slider');
+    term.setCursorPos(2, 4);
+    term.write(string.format('Level: %d/%d', localLevel, table.getn(conf.sides)))
+    local w, h = term.getSize()
+    term.setCursorPos(2, h-1)
+    term.blit('q', 'f', '0')
+    term.write('uit')
+end
+
+
 init()
-ws.connect(conf.computerName)
-ws.runtime()
+parallel.waitForAny(ws.runtime, keyListener)
