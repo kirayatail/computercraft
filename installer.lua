@@ -1,4 +1,4 @@
---7
+--8
 local url = 'https://raw.githubusercontent.com/kirayatail/computercraft/master/'
 local fileList = {}
 local offset = 0
@@ -32,6 +32,9 @@ end
 function remove(index)
     local record = fileList[index]
     if record.localVersion and fs.exists(record.name) then
+        if record.name == getStartup() then
+            toggleStartup(index)
+        end
         fs.delete(record.name)
     end
     refresh()
@@ -65,7 +68,34 @@ function updateOffset(lines)
     end
 end
 
+function getStartup() 
+    if fs.exists('/startup.lua') then
+        file = fs.open('/startup.lua', 'r')
+        startupFile = string.match(file.readLine() or "", "[^'\"]+\.lua")
+        file.close()
+        return startupFile;
+    end
+    return ""
+end
+
+function toggleStartup(index)
+    local record = fileList[index]
+    local filename = record.name
+
+    local command = ""
+    if filename ~= getStartup() then
+        if not record.localVersion then
+            install(index)
+        end
+        command = "shell.run('"..filename.."')"
+    end
+    local file = fs.open('startup.lua', 'w')
+    file.write(command)
+    file.close()
+end
+
 function displayPocket()
+    local startupFile = getStartup()
     term.clear()
     term.setCursorPos(3,1)
     term.write('Pocket Installer')
@@ -82,6 +112,10 @@ function displayPocket()
         end
         if (line + offset <= table.getn(fileList)) then
             local file = fileList[line + offset]
+            if file == startupFile then
+                term.setCursorPos(2, line*2 + 1)
+                term.write('*')
+            end
             term.setCursorPos(3, line*2 + 1)
             term.write(file.name)
             term.setCursorPos(2, line*2 + 2)
@@ -109,13 +143,14 @@ function displayPocket()
 end
 
 function displayStandard()
+    local startupFile = getStartup()
     term.clear()
     term.setCursorPos(3,1)
     term.write('Program Installer')
     term.setCursorPos(2,2)
     term.setBackgroundColor(colors.white)
     term.setTextColor(colors.black)
-    term.write(' Name                       Version   Installed ')
+    term.write('  Name                      Version   Installed ')
     term.setBackgroundColor(colors.black)
     term.setTextColor(colors.white)
     for line = 1,15 do
@@ -125,7 +160,11 @@ function displayStandard()
         end
         if (line + offset <= table.getn(fileList)) then
             local file = fileList[line + offset]
-            term.setCursorPos(3, line + 2)
+            if file.name == startupFile then
+                term.setCursorPos(2, line + 2)
+                term.write('*')
+            end
+            term.setCursorPos(4, line + 2)
             term.write(file.name)
             term.setCursorPos(30, line + 2)
             term.write(string.format("%d", file.version))
@@ -135,13 +174,15 @@ function displayStandard()
             end
         end
     end
-    term.setCursorPos(5, 19)
+    term.setCursorPos(4, 19)
     term.blit('i', 'f', '0')
-    term.write('nstall     ')
+    term.write('nstall  ')
+    term.blit('a', 'f', '0')
+    term.write('utostart  ')
     term.blit('r', 'f', '0')
-    term.write('emove     ')
+    term.write('emove  ')
     term.blit('u', 'f', '0')
-    term.write('pdate all     ')
+    term.write('pdate all  ')
     term.blit('q', 'f', '0')
     term.write('uit')
 end
@@ -163,6 +204,9 @@ function keyListener()
         end
         if key == keys.r or key == keys.delete then
             remove(cursor)
+        end
+        if key == keys.a then
+            toggleStartup(cursor)
         end
         if key == keys.q then
             term.clear()

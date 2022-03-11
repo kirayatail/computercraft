@@ -1,4 +1,4 @@
---3
+--4
 local ws = require('websocket')
 local conf = {}
 local localLevel = 0
@@ -58,15 +58,20 @@ end
 function keyListener()
     local running = true
     while running do
-        local evt, key = os.pullEvent('key')
-        if key == keys.up then
+        
+        local evt, key = os.pullEvent()
+
+        if evt == 'key' and key == keys.up then
             setSides(localLevel + 1)
         end
-        if key == keys.down then
+        if evt == 'key' and key == keys.down then
             setSides(localLevel - 1)
         end
-        if key == keys.q then
+        if evt == 'key' and key == keys.q then
             running = false
+        end
+        if evt == 'mouse_scroll' then
+            setSides(localLevel + key)
         end
     end
     ws.disconnect()
