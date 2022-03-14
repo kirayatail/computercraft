@@ -1,4 +1,4 @@
---4
+--5
 local r = peripheral.wrap('back')
 local targetWaste = 2000
 local targetSteam = math.floor(r.getHotFluidAmountMax() * 0.5)
@@ -25,7 +25,7 @@ function setControl(val)
     local rods = r.getNumberOfControlRods()
     local base = math.floor(val / rods)
     local rest = math.fmod(val, rods)
-    for i = 0, rods do
+    for i = 0, rods - 1 do
         if i < rest then
             r.setControlRodLevel(i, base + 1)
         else

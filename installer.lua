@@ -1,8 +1,9 @@
---8
+--9
 local url = 'https://raw.githubusercontent.com/kirayatail/computercraft/master/'
 local fileList = {}
 local offset = 0
 local cursor = 1
+local width, height = term.getSize()
 
 function refresh()
     fileList = textutils.unserialiseJSON(http.get(url..'list.json').readAll())
@@ -54,7 +55,7 @@ function display()
         updateOffset(8)
         displayPocket()
     else
-        updateOffset(15)
+        updateOffset(height - 4)
         displayStandard()
     end
 end
@@ -153,7 +154,7 @@ function displayStandard()
     term.write('  Name                      Version   Installed ')
     term.setBackgroundColor(colors.black)
     term.setTextColor(colors.white)
-    for line = 1,15 do
+    for line = 1,height-4 do
         if (line == cursor - offset) then
             term.setCursorPos(1, line + 2)
             term.write('>')
@@ -174,7 +175,8 @@ function displayStandard()
             end
         end
     end
-    term.setCursorPos(4, 19)
+
+    term.setCursorPos(4, height)
     term.blit('i', 'f', '0')
     term.write('nstall  ')
     term.blit('a', 'f', '0')
