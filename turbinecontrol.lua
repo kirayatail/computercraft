@@ -1,10 +1,11 @@
---12
+--13
 local t = nil
 local state = {}
 local socket = nil
 local active = {
     'shutdown',
-    'idle',
+    'stop',
+    'coast',
     'online'
 }
 local actFlow = nil
@@ -22,13 +23,13 @@ local options = {
     {
         name = 'state',
         min = 1,
-        max = 3,
+        max = #active,
         pos = 6
     },
     {
         name = 'rpm',
         min = 0,
-        max = 9000,
+        max = 10000,
         pos = 25
     },
     {
@@ -111,7 +112,7 @@ function sendMethods()
                 type='radio',
                 key= 'state',
                 name = 'Power',
-                options = {'online', 'idle', 'shutdown'},
+                options = active,
                 value = active[state.active],
                 fn = function(value)
                     state.active = indexOf(active, value)
@@ -379,11 +380,21 @@ function control()
             targetFlow = 0
             t.setInductorEngaged(true)
         end
-        if state.active == 2 then -- Idle mode
+        if state.active == 2 then -- Stop mode (no output)
             t.setInductorEngaged(false)
             targetFlow = flowCalc(0, targetRPM, rpm)
         end
-        if state.active == 3 then -- Online mode
+        if state.active == 3 then -- Coast mode (idle and output)
+            targetFlow = flowCalc(0, targetRPM, rpm)
+
+            if rpm < (targetRPM - 1) then
+                t.setInductorEngaged(false)
+            end
+            if rpm >= targetRPM then 
+                t.setInductorEngaged(true)
+            end
+        end
+        if state.active == 4 then -- Online mode
             targetFlow = flowCalc(state.target[state.level].flow, targetRPM, rpm)
             
             if rpm < (targetRPM - 1) then
