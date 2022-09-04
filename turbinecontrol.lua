@@ -1,4 +1,4 @@
---15
+--16
 local t = nil
 local state = {}
 local socket = nil
@@ -324,7 +324,7 @@ function displayInfo()
     term.setCursorPos(26, 7)
     if socket then
         if socket.isConnected() then
-            term.write('Websocket ID: '..(socket.id() or '')
+            term.write('Websocket ID: '..(socket.id() or ''))
         else
             term.write('Websocket available')
             term.setCursorPos(26, 9)
