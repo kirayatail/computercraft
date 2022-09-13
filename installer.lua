@@ -1,4 +1,4 @@
---11
+--12
 local url = 'https://raw.githubusercontent.com/kirayatail/computercraft/master/'
 local Term = nil
 local Tbl = nil
@@ -10,10 +10,10 @@ local args = {...}
 
 function init() 
   if not fs.exists('lib/term.lua') then
-    shell.run('installer', 'lib/term.lua')
+    installByName('lib/term.lua')
   end
   if not fs.exists('lib/table.lua') then
-    shell.run('installer', 'lib/table.lua')
+    installByName('lib/table.lua')
   end
   Tbl = require('lib/table')
   Term = require('lib/term')
@@ -42,6 +42,14 @@ function install(index)
   file.write(res)
   file.close()
   refresh()
+end
+
+function installByName(path)
+  fs.delete(path)
+  local res = http.get(url..path, nil, true).readAll()
+  local file = fs.open(path, 'wb')
+  file.write(res)
+  file.close()
 end
 
 function remove(index)
@@ -242,6 +250,7 @@ end
 
 init()
 refresh()
+
 if #args == 0 then 
   display()
   parallel.waitForAll(keyListener)
