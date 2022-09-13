@@ -1,4 +1,4 @@
---10
+--11
 local url = 'https://raw.githubusercontent.com/kirayatail/computercraft/master/'
 local Term = nil
 local Tbl = nil
@@ -13,7 +13,7 @@ function init()
     shell.run('installer', 'lib/term.lua')
   end
   if not fs.exists('lib/table.lua') then
-    --shell.run('installer', 'lib/table.lua')
+    shell.run('installer', 'lib/table.lua')
   end
   Tbl = require('lib/table')
   Term = require('lib/term')
