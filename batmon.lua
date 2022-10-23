@@ -1,5 +1,6 @@
---4
+--5
 local socket = nil
+local Table = nil
 local conf = {}
 local total = 0
 
@@ -9,17 +10,17 @@ local function map(tbl, f)
         t[k] = f(v)
     end
     return t
-end
+end 
 
 local function sum(tbl)
-    local sum = 0
-    for _,v in pairs(tbl) do
-        sum = sum + v
-    end
-    return sum
+    Table.reduce(tbl, function (a, b) return a + b end)
 end
 
 function init()
+    if not fs.exists('lib/table.lua') then
+        shell.run('installer', 'lib/table.lua')
+    end
+    Table = require('lib/table')
     if fs.exists('var/batmon.conf') then
         local file = fs.open('var/batmon.conf', 'r')
         conf = textutils.unserialise(file.readAll())
@@ -49,8 +50,8 @@ end
 function monitor()
     while true do
         local bats = { peripheral.find('thermalexpansion:storage_cell') }
-        local stored = sum(map(bats, function(b) return b.getRFStored() end)) / 1000
-        local total = sum(map(bats, function(b) return b.getRFCapacity() end)) / 1000
+        local stored = sum(Table.map(bats, function(b) return b.getRFStored() end)) / 1000
+        local total = sum(Table.map(bats, function(b) return b.getRFCapacity() end)) / 1000
         if socket then
             socket.info({
                 {

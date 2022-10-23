@@ -1,4 +1,4 @@
---1
+--2
 local function filter(tbl, f)
   if tbl == nil then return nil end
   if f == nil then return {} end
@@ -15,6 +15,13 @@ local function find(tbl, f)
     if f(v,k,tbl) then return v, k end
   end
   return nil
+end
+local function indexOf(tbl, val)
+  local index = {}
+  for k,v in pairs(tbl) do
+      index[v] = k
+  end
+  return index[val] or -1
 end
 local function map(tbl, f)
   if tbl == nil then return nil end
@@ -41,10 +48,16 @@ local function reduce(tbl, f, initial)
   end
   return result
 end
-
+local function push(tbl, item)
+  if tbl == nil then return nil end
+  tbl[#tbl + 1] = item
+  return tbl
+end
 return {
   filter = filter,
   find = find,
+  indexOf = indexOf,
   map = map,
-  reduce = reduce
+  reduce = reduce,
+  push = push
 }
