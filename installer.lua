@@ -1,4 +1,4 @@
---12
+--13
 local url = 'https://raw.githubusercontent.com/kirayatail/computercraft/master/'
 local Term = nil
 local Tbl = nil
@@ -241,7 +241,7 @@ function cli()
 
   print('installing '..path)
   if autostartFlag then
-    setStartup(index)
+    setStartup(index, true)
   else
     install(index)
   end
