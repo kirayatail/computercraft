@@ -1,8 +1,8 @@
---5
-local r = peripheral.wrap('back')
+--6
+local r = peripheral.wrap('bottom')
 local targetWaste = 2000
-local targetSteam = math.floor(r.getHotFluidAmountMax() * 0.5)
-local stopSteam = math.floor(r.getHotFluidAmountMax() * 0.9)
+local targetSteam = math.floor(r.getHotFluidAmountMax() * 0.6)
+local stopSteam = math.floor(r.getHotFluidAmountMax())
 local prevSteam = -1
 
 function getMaxControl() 
