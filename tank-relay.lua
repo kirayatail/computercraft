@@ -1,7 +1,9 @@
---1
+--2
 local config = {
   tankSide = "back",
-  signalSide = "bottom"
+  signalSide = "bottom",
+  tankNumber = 1,
+  tankLimit = 1
 }
 
 local function init()
@@ -26,7 +28,8 @@ local function watcher()
       running = false
       return
     end
-    rs.setOutput(config.signalSide, tanks[1].amount ~= nil)
+    local amt = tanks[config.tankNumber].amount
+    rs.setOutput(config.signalSide, amt ~= nil and amt > config.tankLimit)
     sleep(5)
   end
 end
