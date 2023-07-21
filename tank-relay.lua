@@ -1,9 +1,9 @@
---2
+--3
 local config = {
   tankSide = "back",
   signalSide = "bottom",
   tankNumber = 1,
-  tankLimit = 1
+  tankLimit = 5000
 }
 
 local function init()
@@ -34,4 +34,5 @@ local function watcher()
   end
 end
 
+init()
 watcher()
