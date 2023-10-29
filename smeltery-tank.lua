@@ -80,12 +80,12 @@ function keyListener()
     local _, key = os.pullEvent('key')
     
     if key == keys.up and config.percentage < 90 then
-      config.percentage += 10
+      config.percentage = config.percentage + 10
       writeConfig()
     end
 
     if key == keys.down and config.percentage > 0 then
-      config.percentage -= 10
+      config.percentage = config.percentage - 10
       writeConfig()
     end
     if key == keys.space then
