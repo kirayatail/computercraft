@@ -1,9 +1,10 @@
---1
+--2
 local config = {}
 local Term = nil
 local Table = nil
 local port = nil
 local cursor = 1
+local limit = false
 
 local function init() 
   if fs.exists('var/smeltery.conf') then
@@ -53,6 +54,9 @@ local function display()
   if cursor > #current then cursor = #current end
   if cursor == 0 then cursor = 1 end
   term.clear()
+  if limit then
+    Term.out('Limit active', 1, 5)
+  end
   for i = 1, #current do
     if cursor == i then
       Term.out(">", i+2, 1)
@@ -90,6 +94,9 @@ function keyListener()
     if key == keys.enter then
       port.getController().selectMolten(cursor)
     end
+    if key == keys.l then
+      limit = not limit
+    end
     if key == keys.q then 
       running = false
     end
@@ -103,10 +110,14 @@ end
 
 function signal()
   while true do
-    local current = getCurrent()
-    rs.setOutput(config.portSide, 
-      #current > 0 and Table.indexOf(config.metals, current[1]) > -1
-    )
+    local moltenList = port.getController().getMolten()
+    if (#moltenList > 0) then
+      local entry = moltenList[1]
+      local aboveLimit = (not limit) or entry.amount > 20000
+      rs.setOutput(config.portSide, Table.indexOf(config.metals, entry.displayName) > -1 and aboveLimit)
+    else
+      rs.setOutput(config.portSide, false)
+    end
     display()
   end
 end
