@@ -1,4 +1,4 @@
--- 2
+-- 3
 local Table = nil
 local socket = nil
 local selectedIndex = 1
@@ -44,11 +44,11 @@ end
 
 local function sendMethods()
     if socket then
-        socket.info({
+        socket.info({{
             key = "Version",
-            value = 2,
+            value = 3,
             type = 'number'
-        })
+        }})
         socket.methods({{
             type = 'text',
             key = 'playername',
