@@ -1,4 +1,4 @@
--- 4
+-- 5
 local Table = nil
 local socket = nil
 local selectedIndex = 1
@@ -46,7 +46,7 @@ local function sendMethods()
     if socket then
         socket.info({{
             key = "Version",
-            value = 3,
+            value = 5,
             type = 'number'
         }})
         socket.methods({{
@@ -94,7 +94,7 @@ local function sendMethods()
                 local item = itemList[selectedIndex]
                 local count = selectedAmount
                 print('Giving ' .. playername .. ' ' .. count .. ' ' .. item.name)
-                while count > 1 do
+                while count >= 1 do
                     if count > 64 then
                         commands.give(playername, item.code, 64, item.dmg)
                         count = count - 64
