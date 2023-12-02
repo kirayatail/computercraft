@@ -1,4 +1,4 @@
--- 1
+-- 2
 local Table = nil
 local socket = nil
 local selectedIndex = 1
@@ -44,6 +44,11 @@ end
 
 local function sendMethods()
     if socket then
+        socket.info({
+            key = "Version",
+            value = 2,
+            type = 'number'
+        })
         socket.methods({{
             type = 'text',
             key = 'playername',
@@ -91,10 +96,10 @@ local function sendMethods()
                 print('Giving ' .. playername .. ' ' .. count .. ' ' .. item.name)
                 while count > 1 do
                     if count > 64 then
-                        commands.give(playername, item.code, 64, item.dmg)
+                        commands.exec(string.format("/give %s %s %d %d", playername, item.code, 64, item.dmg))
                         count = count - 64
                     else
-                        commands.give(playername, item.code, 64, item.dmg)
+                        commands.exec(string.format("/give %s %s %d %d", playername, item.code, 64, item.dmg))
                         count = 0
                     end
                 end
