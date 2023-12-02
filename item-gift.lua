@@ -1,4 +1,4 @@
--- 3
+-- 4
 local Table = nil
 local socket = nil
 local selectedIndex = 1
@@ -96,10 +96,10 @@ local function sendMethods()
                 print('Giving ' .. playername .. ' ' .. count .. ' ' .. item.name)
                 while count > 1 do
                     if count > 64 then
-                        commands.exec(string.format("/give %s %s %d %d", playername, item.code, 64, item.dmg))
+                        commands.give(playername, item.code, 64, item.dmg)
                         count = count - 64
                     else
-                        commands.exec(string.format("/give %s %s %d %d", playername, item.code, 64, item.dmg))
+                        commands.give(playername, item.code, count, item.dmg)
                         count = 0
                     end
                 end
