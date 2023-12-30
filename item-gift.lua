@@ -1,4 +1,4 @@
--- 5
+-- 6
 local Table = nil
 local socket = nil
 local selectedIndex = 1
@@ -25,6 +25,11 @@ local itemList = {{
     code = 'thaumcraft:ore_cinnabar',
     dmg = 0
 }, {
+    name = 'Uranium ore',
+    stackSize = 64,
+    code = 'ic2:resource',
+    dmg = 4
+}, {
     name = 'Block of Enderpearl',
     stackSize = 64,
     code = 'actuallyadditions:block_misc',
@@ -46,7 +51,7 @@ local function sendMethods()
     if socket then
         socket.info({{
             key = "Version",
-            value = 5,
+            value = 6,
             type = 'number'
         }})
         socket.methods({{
