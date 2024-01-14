@@ -1,13 +1,22 @@
--- 6
+-- 7
+local version = 7
 local Table = nil
 local socket = nil
-local selectedIndex = 1
-local selectedAmount = 1
-local playername = ''
+local config = {
+    selectedIndex = 1,
+    selectedAmount = 1,
+    playername = ''
+}
+local configPath = 'var/item-gift.conf'
 local itemList = {{
     name = 'Iron ore',
     stackSize = 64,
     code = 'minecraft:iron_ore',
+    dmg = 0
+}, {
+    name = 'Copper ore',
+    stackSize = 64,
+    code = 'thermalfoundation:ore',
     dmg = 0
 }, {
     name = 'Silver ore',
@@ -15,10 +24,10 @@ local itemList = {{
     code = 'thermalfoundation:ore',
     dmg = 2
 }, {
-    name = 'Copper ore',
+    name = 'Lead ore',
     stackSize = 64,
     code = 'thermalfoundation:ore',
-    dmg = 0
+    dmg = 3
 }, {
     name = 'Cinnabar ore',
     stackSize = 64,
@@ -45,22 +54,38 @@ local function init()
         shell.run('installer websocket.lua')
     end
     socket = require('websocket')
+
+    if not fs.exists(configPath) then
+        local file = fs.open(configPath, 'w')
+        file.write(textutils.serialise(config))
+        file.close()
+    end
+    local file = fs.open(configPath, 'r')
+    config = textutils.unserialise(file.readAll())
+    file.close()
+end
+
+local function setConfig(key, value)
+    config[key] = value
+    local file = fs.open(configPath, 'w')
+    file.write(textutils.serialise(config))
+    file.close()
 end
 
 local function sendMethods()
     if socket then
         socket.info({{
             key = "Version",
-            value = 6,
+            value = version,
             type = 'number'
         }})
         socket.methods({{
             type = 'text',
             key = 'playername',
             name = 'Player',
-            value = playername,
+            value = config.playername,
             fn = function(value)
-                playername = value
+                setConfig('playername', value)
                 return value
             end
         }, {
@@ -70,25 +95,25 @@ local function sendMethods()
             options = Table.map(itemList, function(item)
                 return item.name
             end),
-            value = itemList[selectedIndex].name,
+            value = itemList[config.selectedIndex].name,
             fn = function(value)
                 local _, index = Table.find(itemList, function(item)
                     return item.name == value
                 end)
-                selectedIndex = index
+                setConfig('selectedIndex', index)
                 return value
             end
         }, {
             type = 'number',
             key = 'selectedAmount',
             name = 'Amount',
-            value = selectedAmount,
+            value = config.selectedAmount,
             min = 1,
             fn = function(value)
                 if value == nil or value < 1 then
                     value = 1
                 end
-                selectedAmount = value
+                setConfig('selectedAmount', value)
                 return value
             end
         }, {
@@ -96,15 +121,15 @@ local function sendMethods()
             key = 'exec',
             name = 'Give items',
             fn = function()
-                local item = itemList[selectedIndex]
-                local count = selectedAmount
-                print('Giving ' .. playername .. ' ' .. count .. ' ' .. item.name)
+                local item = itemList[config.selectedIndex]
+                local count = config.selectedAmount
                 while count >= 1 do
+                    print('Giving ' .. config.playername .. ' ' .. count .. ' ' .. item.name)
                     if count > 64 then
-                        commands.give(playername, item.code, 64, item.dmg)
+                        commands.give(config.playername, item.code, 64, item.dmg)
                         count = count - 64
                     else
-                        commands.give(playername, item.code, count, item.dmg)
+                        commands.give(config.playername, item.code, count, item.dmg)
                         count = 0
                     end
                 end
