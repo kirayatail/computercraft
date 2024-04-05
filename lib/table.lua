@@ -1,4 +1,4 @@
---2
+--3
 local function filter(tbl, f)
   if tbl == nil then return nil end
   if f == nil then return {} end
@@ -53,11 +53,29 @@ local function push(tbl, item)
   tbl[#tbl + 1] = item
   return tbl
 end
+local function some(tbl, predicate)
+  for k,v in pairs(tbl) do
+    if predicate(v, k) then
+      return true
+    end
+  end
+  return false;
+end
+local function every(tbl, predicate)
+  for k,v in pairs(tbl) do
+    if predicate(v,k) == false then
+      return false
+    end
+  end
+  return true
+end
 return {
   filter = filter,
   find = find,
   indexOf = indexOf,
   map = map,
   reduce = reduce,
-  push = push
+  push = push,
+  some = some,
+  every = every
 }

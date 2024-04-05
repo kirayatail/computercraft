@@ -1,4 +1,4 @@
---2
+--3
 local config = {}
 local Term = nil
 local Table = nil
@@ -113,7 +113,10 @@ function signal()
     local moltenList = port.getController().getMolten()
     if (#moltenList > 0) then
       local entry = moltenList[1]
-      local aboveLimit = (not limit) or entry.amount > 20000
+      local allFlushable = Table.every(moltenList, function(item)
+        return Table.indexOf(config.metals, item.displayName) > -1
+      end)
+      local aboveLimit = (not limit) or entry.amount > 20000 or allFlushable
       rs.setOutput(config.portSide, Table.indexOf(config.metals, entry.displayName) > -1 and aboveLimit)
     else
       rs.setOutput(config.portSide, false)
