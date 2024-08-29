@@ -1,4 +1,4 @@
--- 4
+-- 5
 local config = {}
 local Term = nil
 local Table = nil
@@ -73,7 +73,7 @@ local function display()
             Term.out('*', i + 2, 3)
         end
         Term.out(current[i].name, i + 2, 5)
-        Term.out(current[i].amount, i + 2, 20)
+        Term.out(current[i].amount, i + 2, 30)
     end
 end
 
