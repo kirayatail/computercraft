@@ -1,5 +1,6 @@
--- 5
+-- 6
 local ws = require('websocket')
+local confFilename = 'var/signal.conf'
 local conf = {}
 
 function setSides(count)
@@ -18,9 +19,8 @@ function setSides(count)
 end
 
 function init()
-    local filename = 'var/signal.conf'
-    if fs.exists(filename) then
-        local file = fs.open(filename, 'r')
+    if fs.exists(confFilename) then
+        local file = fs.open(confFilename, 'r')
         conf = textutils.unserialise(file.readAll())
         file.close()
     else
@@ -30,9 +30,7 @@ function init()
             methodKey = 'Level',
             level = 0
         }
-        local file = fs.open(filename, 'w')
-        file.write(textutils.serialise(conf))
-        file.close()
+        saveConf()
     end
     if conf.level == nil then
         conf.level = 0
@@ -43,7 +41,7 @@ function init()
 end
 
 function saveConf()
-    local file = fs.open(filename, 'w')
+    local file = fs.open(confFilename, 'w')
     file.write(textutils.serialise(conf))
     file.close()
 end
