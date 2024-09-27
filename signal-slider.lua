@@ -1,4 +1,4 @@
--- 6
+-- 7
 local ws = require('websocket')
 local confFilename = 'var/signal.conf'
 local conf = {}
@@ -35,6 +35,7 @@ function init()
     if conf.level == nil then
         conf.level = 0
     end
+    setSides(conf.level)
     display()
     ws.connect(conf.computerName, true)
     sendMethods()
