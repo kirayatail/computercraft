@@ -1,17 +1,15 @@
---4
+-- 5
 local ws = require('websocket')
 local conf = {}
-local localLevel = 0
-
 
 function setSides(count)
     if count > table.getn(conf.sides) then
         count = table.getn(conf.sides)
     end
-    if count < 0 then 
+    if count < 0 then
         count = 0
     end
-    localLevel = count
+    conf.level = count
     for i = 1, table.getn(conf.sides) do
         redstone.setOutput(conf.sides[i], i <= count)
     end
@@ -27,52 +25,61 @@ function init()
         file.close()
     else
         conf = {
-            sides = { 'back' },
+            sides = {'back'},
             computerName = 'Signal slider',
-            methodKey = 'Level'
+            methodKey = 'Level',
+            level = 0
         }
         local file = fs.open(filename, 'w')
         file.write(textutils.serialise(conf))
         file.close()
+    end
+    if conf.level == nil then
+        conf.level = 0
     end
     display()
     ws.connect(conf.computerName, true)
     sendMethods()
 end
 
-function sendMethods() 
-    ws.methods({
-        {
-            type = "slider",
-            key = conf.methodKey,
-            value = localLevel,
-            min = 0,
-            max = table.getn(conf.sides),
-            fn = function (level)
-                setSides(tonumber(level))
-            end
-        }
-    })
+function saveConf()
+    local file = fs.open(filename, 'w')
+    file.write(textutils.serialise(conf))
+    file.close()
+end
+
+function sendMethods()
+    ws.methods({{
+        type = "slider",
+        key = conf.methodKey,
+        value = conf.level,
+        min = 0,
+        max = table.getn(conf.sides),
+        fn = function(level)
+            setSides(tonumber(level))
+        end
+    }})
 end
 
 function keyListener()
     local running = true
     while running do
-        
+
         local evt, key = os.pullEvent()
 
         if evt == 'key' and key == keys.up then
-            setSides(localLevel + 1)
+            setSides(conf.level + 1)
         end
         if evt == 'key' and key == keys.down then
-            setSides(localLevel - 1)
+            setSides(conf.level - 1)
         end
         if evt == 'key' and key == keys.q then
             running = false
         end
         if evt == 'mouse_scroll' then
-            setSides(localLevel + key)
+            setSides(conf.level + key)
         end
+        saveConf()
     end
     ws.disconnect()
     term.clear()
@@ -83,13 +90,12 @@ function display()
     term.setCursorPos(2, 2)
     term.write('Signal Slider');
     term.setCursorPos(2, 4);
-    term.write(string.format('Level: %d/%d', localLevel, table.getn(conf.sides)))
+    term.write(string.format('Level: %d/%d', conf.level, table.getn(conf.sides)))
     local w, h = term.getSize()
-    term.setCursorPos(2, h-1)
+    term.setCursorPos(2, h - 1)
     term.blit('q', 'f', '0')
     term.write('uit')
 end
-
 
 init()
 parallel.waitForAny(ws.runtime, keyListener)
