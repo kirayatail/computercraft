@@ -1,5 +1,5 @@
--- 7
-local version = 7
+-- 8
+local version = 8
 local Table = nil
 local socket = nil
 local config = {
@@ -43,6 +43,11 @@ local itemList = {{
     stackSize = 64,
     code = 'actuallyadditions:block_misc',
     dmg = 6
+}, {
+    name = 'Oil Sand',
+    stackSize = 64,
+    code = "thermalfoundation:ore_fluid",
+    dmg = 0
 }}
 
 local function init()
