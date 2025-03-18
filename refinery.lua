@@ -1,4 +1,4 @@
--- 1
+-- 2
 local configFilepath = 'var/refinery.conf'
 local Term = nil
 local chest = nil
@@ -37,6 +37,7 @@ function writeConfig()
 end
 
 local function display()
+    term.clear()
     Term.out('Output:', 2, 2)
     Term.out(config.state, 2, 10)
 end
