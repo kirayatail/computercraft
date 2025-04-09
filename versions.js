@@ -35,7 +35,7 @@ const removedFiles = diff
 
 const allCorrect = newFiles.every((newFile) => {
   const oldFile = oldList.find((f) => f.name === newFile.name);
-  const correct = !(oldFile && oldFile.version >= newFile.version);
+  const correct = !(oldFile && oldFile.version >= newFile.version) && newFile.version > 0;
   if (!correct) {
     console.error(`Version in ${newFile.name} must be updated`);
   }
