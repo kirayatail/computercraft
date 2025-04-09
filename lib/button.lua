@@ -1,4 +1,4 @@
--- 1
+-- 2
 -- Button api for computercraft by Siarko
 -- Usage:
 --
@@ -37,7 +37,7 @@ local _locales = {
 }
 
 -- button class
-function create(text)
+local function create(text)
   local this = {
     x = 1,
     y = 1,
@@ -185,12 +185,12 @@ function create(text)
 end
 
 -- set Monitor handle to draw on
-function setMonitor(mon)
+local function setMonitor(mon)
   _locales.mon = mon
   -- MON = mon
 end
 
-function clearMon()
+local function clearMon()
   _locales.mon.clear()
 end
 
@@ -212,7 +212,7 @@ local function mergeTables(tab1, tab2)
 end
 
 -- manage button checks
-function await(...)
+local function await(...)
   array = {}
   for i in pairs(arg) do
     if i ~= "n" then
@@ -238,3 +238,10 @@ function await(...)
     end
   end
 end
+
+return {
+  create = create,
+  await = await,
+  setMonitor = setMonitor,
+  clearMon = clearMon
+}
