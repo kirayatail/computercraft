@@ -1,4 +1,4 @@
--- 1
+-- 2
 local config = {}
 local configPath = 'var/radio-door.conf'
 local Button = nil
@@ -19,7 +19,7 @@ function init()
   end
   Button = require('lib/button')
   monitor = peripheral.find('monitor')
-  buttons = {stdButton(4, 3, 'Open'), stdButton(7, 3, 'Close')}
+  buttons = {stdButton(4, 3, 'Open'), stdButton(4, 7, 'Close')}
   Button.setMonitor(monitor)
   Button.clearMon()
 
@@ -59,10 +59,11 @@ function send(message)
   end
   if message == 'Close' then
     sleep(0.5)
-    rednet.broadcast(false, 'door1')
+    rednet.broadcast(true, 'door1')
     sleep(0.5)
-    rednet.broadcast(false, 'door2')
+    rednet.broadcast(true, 'door2')
   end
+  rednet.close()
 end
 
 function buttonListener()
@@ -80,9 +81,11 @@ function keyListener()
       running = false
     end
   end
+  monitor.clear()
   term.clear()
+  term.setCursorPos(1, 1)
 end
 
 init()
 parallel.waitForAny(keyListener, buttonListener)
-return 0
+return true
