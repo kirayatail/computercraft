@@ -1,4 +1,4 @@
--- 1
+-- 2
 local config = {}
 local Table = nil
 local Term = nil
@@ -34,17 +34,16 @@ local function init()
     config.inventorySide = Term.prompt('Which side has the inventory?')
   end
   if config.maxCount == nil then
-    config.maxCount = tonumber(Term.prompt('Which side has the inventory?'))
+    config.maxCount = tonumber(Term.prompt('Maximum capacity count'))
   end
   if config.inverted == nil then
     config.inverted = false
   end
   writeConfig()
   port = peripheral.wrap(config.inventorySide)
-  display()
 end
 
-local function level()
+local function sense()
   while true do
     local itemlist = port.list()
     local itemcount = Table.reduce(Table.map(itemlist, function(item)
@@ -80,4 +79,4 @@ end
 
 init()
 display()
-parallel.waitForAny(level, signal)
+parallel.waitForAny(sense, signal)
