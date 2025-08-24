@@ -1,4 +1,4 @@
--- 2
+-- 3
 local function out(value, row, col)
   if row ~= nil and col ~= nil then
     term.setCursorPos(col, row)
@@ -12,6 +12,12 @@ local function initial(value, bg, fg, row, col)
   term.blit(string.sub(value, 1, 1), bg, fg)
   term.write(string.sub(value, 2, -1))
 end
+local function prompt(text)
+  term.clear()
+  term.setCursorPos(1, 2)
+  print(text)
+  return read()
+end
 local function rightAlign(value, row, col)
   local length = #(tostring(val))
   term.setCursorPos(col + 1 - #(tostring(value)), row)
@@ -20,5 +26,6 @@ end
 return {
   initial = initial,
   out = out,
+  prompt = prompt,
   rightAlign = rightAlign
 }
