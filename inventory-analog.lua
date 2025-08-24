@@ -1,4 +1,4 @@
--- 2
+-- 3
 local config = {}
 local Table = nil
 local Term = nil
@@ -43,6 +43,16 @@ local function init()
   port = peripheral.wrap(config.inventorySide)
 end
 
+local function display()
+  term.clear()
+  term.setCursorPos(2, 2)
+  term.write("Current level: " .. tostring(level))
+  if config.inverted then
+    term.setCursorPos(2, 4)
+    term.write("Output inverted")
+  end
+end
+
 local function sense()
   while true do
     local itemlist = port.list()
@@ -51,7 +61,7 @@ local function sense()
     end), function(a, b)
       return a + b
     end, 0)
-    level = math.round(math.min((15 * itemcount) / config.maxCount, 15))
+    level = math.floor(math.min((15 * itemcount) / config.maxCount, 15) + 0.5)
     if config.inverted then
       level = 15 - level
     end
@@ -64,16 +74,6 @@ local function signal()
   while true do
     rs.setAnalogOutput(config.outputSide, level)
     sleep(1)
-  end
-end
-
-local function display()
-  term.clear()
-  term.setCursorPos(2, 2)
-  term.write("Current level: " .. tostring(level))
-  if config.inverted then
-    term.setCursorPos(2, 4)
-    term.write("Output inverted")
   end
 end
 
