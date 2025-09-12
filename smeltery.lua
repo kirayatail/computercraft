@@ -1,9 +1,10 @@
--- 6
+-- 7
 local config = {}
 local Term = nil
 local Table = nil
 local port = nil
 local cursor = 1
+local purge = false
 
 local function init()
   if fs.exists('var/smeltery.conf') then
@@ -62,8 +63,11 @@ local function display()
     cursor = 1
   end
   term.clear()
-  if config.limit then
+  if config.limit and not purge then
     Term.out('Limit active', 2, 5)
+  end
+  if purge then
+    Term.out('Purge', 2, 5)
   end
   for i = 1, #current do
     if cursor == i then
@@ -107,6 +111,9 @@ function keyListener()
       config.limit = not config.limit
       writeConfig()
     end
+    if key == keys.p then
+      purge = not purge
+    end
     if key == keys.q then
       running = false
     end
@@ -127,11 +134,14 @@ function signal()
         return Table.indexOf(config.metals, item.displayName) > -1
       end)
       local aboveLimit = (not config.limit) or entry.amount > 20000 or allFlushable
-      rs.setOutput(config.portSide, Table.indexOf(config.metals, entry.displayName) > -1 and aboveLimit)
+      local shouldOutput = purge or (Table.indexOf(config.metals, entry.displayName) > -1 and aboveLimit)
+      rs.setOutput(config.portSide, shouldOutput)
     else
+      purge = false
       rs.setOutput(config.portSide, false)
     end
     display()
+    sleep(0.05)
   end
 end
 
