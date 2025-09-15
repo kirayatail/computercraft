@@ -1,5 +1,5 @@
--- 9
-local version = 9
+-- 10
+local version = 10
 local Table = nil
 local socket = nil
 local config = {
@@ -9,14 +9,19 @@ local config = {
 }
 local configPath = 'var/item-gift.conf'
 local itemList = {{
+  name = 'Block of Enderpearl',
+  stackSize = 64,
+  code = 'actuallyadditions:block_misc',
+  dmg = 6
+}, {
+  name = 'Cinnabar ore',
+  stackSize = 64,
+  code = 'thaumcraft:ore_cinnabar',
+  dmg = 0
+}, {
   name = 'Coal ore',
   stackSize = 64,
   code = 'minecraft:coal_ore',
-  dmg = 0
-}, {
-  name = 'Iron ore',
-  stackSize = 64,
-  code = 'minecraft:iron_ore',
   dmg = 0
 }, {
   name = 'Copper ore',
@@ -24,35 +29,35 @@ local itemList = {{
   code = 'thermalfoundation:ore',
   dmg = 0
 }, {
-  name = 'Silver ore',
+  name = 'Iron ore',
   stackSize = 64,
-  code = 'thermalfoundation:ore',
-  dmg = 2
+  code = 'minecraft:iron_ore',
+  dmg = 0
 }, {
   name = 'Lead ore',
   stackSize = 64,
   code = 'thermalfoundation:ore',
   dmg = 3
 }, {
-  name = 'Cinnabar ore',
+  name = 'Nickel ore',
   stackSize = 64,
-  code = 'thaumcraft:ore_cinnabar',
-  dmg = 0
-}, {
-  name = 'Uranium ore',
-  stackSize = 64,
-  code = 'ic2:resource',
-  dmg = 4
-}, {
-  name = 'Block of Enderpearl',
-  stackSize = 64,
-  code = 'actuallyadditions:block_misc',
-  dmg = 6
+  code = 'thermalfoundation:ore',
+  dmg = 5
 }, {
   name = 'Oil Sand',
   stackSize = 64,
   code = "thermalfoundation:ore_fluid",
   dmg = 0
+}, {
+  name = 'Silver ore',
+  stackSize = 64,
+  code = 'thermalfoundation:ore',
+  dmg = 2
+}, {
+  name = 'Uranium ore',
+  stackSize = 64,
+  code = 'ic2:resource',
+  dmg = 4
 }}
 
 local function init()
