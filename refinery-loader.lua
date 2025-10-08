@@ -1,10 +1,10 @@
--- 2
+-- 3
 local shouldRun = true
 
 function itemCount()
   local count = 0
   for i = 1, 6 do
-    count = count + turtle.getItemCount()
+    count = count + turtle.getItemCount(i)
   end
   return count
 end
