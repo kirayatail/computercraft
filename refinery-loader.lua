@@ -1,4 +1,4 @@
--- 1
+-- 2
 local shouldRun = true
 
 function itemCount()
@@ -34,28 +34,29 @@ function empty()
   turtle.select(1)
 end
 
-function cycle()
-  fill()
-  unload()
-  empty()
-  sleep(1)
-end
-
 function runner()
   while shouldRun do
-    if redstone.getInput('left') then
-      cycle()
-    else
+    fill()
+    while not redstone.getInput('left') do
       sleep(10)
     end
+    unload()
+    empty()
+    sleep(1)
   end
 end
 
 function keyListener()
+  term.clear()
   while true do
     local evt, key = os.pullEvent('key')
     if key == keys.q then
-      shouldRun = false
+      shouldRun = not shouldRun
+    end
+    term.clear()
+    if shouldRun then
+      term.setCursorPos(2, 2)
+      print('Loader will stop')
     end
   end
 end
