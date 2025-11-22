@@ -1,4 +1,4 @@
--- 4
+-- 5
 local shouldRun = true
 local currentProgram = 1
 local programSteps = {"Filling items", "Wait for items", "Wait for signal", "Pushing items to machine",
@@ -16,7 +16,7 @@ end
 function fill()
   pc = 1
   display()
-  while itemCount() < (6 * 64) do
+  while itemCount() < (6 * 64) and shouldRun do
     local gotItems = turtle.suckDown()
     if not gotItems then
       pc = 2
@@ -52,14 +52,18 @@ end
 function runner()
   while shouldRun do
     fill()
-    while not redstone.getInput('left') do
+    while not redstone.getInput('left') and shouldRun do
       pc = 3
       display()
       sleep(10)
     end
-    unload()
+    if shouldRun then
+      unload()
+    end
     empty()
-    sleep(10)
+    if shouldRun then
+      sleep(10)
+    end
   end
 end
 
@@ -85,7 +89,7 @@ function keyListener()
   while true do
     local evt, key = os.pullEvent('key')
     if key == keys.q then
-      shouldRun = not shouldRun
+      shouldRun = false
     end
     display()
   end
