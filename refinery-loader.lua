@@ -1,4 +1,4 @@
--- 5
+-- 6
 local shouldRun = true
 local currentProgram = 1
 local programSteps = {"Filling items", "Wait for items", "Wait for signal", "Pushing items to machine",
@@ -16,6 +16,7 @@ end
 function fill()
   pc = 1
   display()
+  turtle.select(1)
   while itemCount() < (6 * 64) and shouldRun do
     local gotItems = turtle.suckDown()
     if not gotItems then
