@@ -1,4 +1,4 @@
--- 1
+-- 2
 local config = {
   chestSide = "back",
   signalSide = "bottom",
@@ -18,6 +18,18 @@ local function init()
   file.close()
 end
 
+local function display(count, active)
+  term.clear()
+  term.setCursorPos(1, 1)
+  term.write('Item Relay')
+  term.setCursorPos(1, 3)
+  term.write('Count: ' .. tostring(count))
+  term.setCursorPos(1, 4)
+  term.write('Limit: ' .. tostring(config.chestLimit))
+  term.setCursorPos(1, 5)
+  term.write('Active: ' .. tostring(active))
+end
+
 local function watcher()
   local p = peripheral.wrap(config.chestSide)
   local running = true
@@ -30,7 +42,9 @@ local function watcher()
       return
     end
     local count = slots[config.chestSlot].amount
-    rs.setOutput(config.signalSide, count ~= nil and count > config.chestLimit)
+    local active = count ~= nil and count > config.chestLimit
+    display(count, active)
+    rs.setOutput(config.signalSide, active)
     sleep(5)
   end
 end
