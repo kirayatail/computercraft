@@ -1,4 +1,4 @@
--- 2
+-- 3
 local config = {
   chestSide = "back",
   signalSide = "bottom",
@@ -41,7 +41,7 @@ local function watcher()
       running = false
       return
     end
-    local count = slots[config.chestSlot].amount
+    local count = slots[config.chestSlot].count
     local active = count ~= nil and count > config.chestLimit
     display(count, active)
     rs.setOutput(config.signalSide, active)
