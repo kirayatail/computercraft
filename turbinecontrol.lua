@@ -1,10 +1,12 @@
--- 17
+-- 18
 local t = nil
 local state = {}
 local socket = nil
 local active = {'shutdown', 'stop', 'coast', 'online'}
 local actFlow = nil
 local targetFlow = 0
+local e_stop = false
+local e_stopLimit = 800000
 
 local function indexOf(tbl, val)
   local index = {}
@@ -370,6 +372,7 @@ function control()
         t.setInductorEngaged(true)
       end
     end
+
     if state.active == 4 then -- Online mode
       targetFlow = flowCalc(state.target[state.level].flow, targetRPM, rpm)
 
@@ -380,6 +383,18 @@ function control()
         t.setInductorEngaged(true)
       end
     end
+
+    -- Emergency stop sets the stop level, building RPM instead of RF
+    if t.getEnergyStored() > e_stopLimit then
+      e_stop = true
+      state.active = 2
+    end
+    -- Switch to coast to bleed off RF
+    if e_stop and t.getEnergyStored() == 0 then
+      e_stop = false
+      state.active = 3
+    end
+
     display()
     sleep(0.1)
   end
