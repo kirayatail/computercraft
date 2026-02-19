@@ -1,4 +1,4 @@
--- 18
+-- 19
 local t = nil
 local state = {}
 local socket = nil
@@ -29,7 +29,7 @@ local options = {{
 }, {
   name = 'flow',
   min = 0,
-  max = 2000,
+  max = 20000,
   pos = 37
 }}
 
@@ -60,9 +60,10 @@ function init()
   t = peripheral.wrap(state.portSide)
   actFlow = t.getFluidFlowRateMax()
 
-  if fs.exists('websocket.lua') then
-    socket = require('websocket');
+  if not fs.exists('lib/websocket.lua') then
+    shell.run('installer lib/websocket.lua')
   end
+  socket = require('lib/websocket');
 end
 
 function setPortSide()
@@ -147,6 +148,23 @@ function sendMethods()
   end
 end
 
+function setStateRelative(option, diff)
+  if option.name == 'state' then
+    local amt = state.active + diff
+    if amt >= 1 and amt <= #active then
+      state.active = amt
+    end
+  else
+    local amt = state.target[state.level][option.name] + diff
+    if amt >= option.min and amt <= option.max then
+      state.target[state.level][option.name] = amt
+    end
+  end
+
+  writeState()
+  sendMethods()
+end
+
 function sendInfo()
   if socket then
     local rf = t.getEnergyProducedLastTick()
@@ -175,6 +193,13 @@ function sendInfo()
       key = 'Storing energy',
       value = t.getEnergyStored() > 10000,
       type = 'warning'
+    }, {
+      key = 'Flow',
+      value = actFlow,
+      type = 'progress',
+      target = targetFlow,
+      min = 0,
+      max = 2000
     }})
   end
 end
@@ -211,38 +236,17 @@ function keyListener()
       end
     end
     writeState()
-    sendMethods()
     display()
   end
 end
 
 function increase()
   local opt = options[state.cursor]
-  if opt.name == 'state' then
-    local amt = state.active + 1
-    if amt <= opt.max then
-      state.active = amt
-    end
-  else
-    local amt = state.target[state.level][opt.name] + 1
-    if amt <= opt.max then
-      state.target[state.level][opt.name] = amt
-    end
-  end
+  setStateRelative(opt, 1)
 end
 function decrease()
   local opt = options[state.cursor]
-  if opt.name == 'state' then
-    local amt = state.active - 1
-    if amt >= opt.min then
-      state.active = amt
-    end
-  else
-    local amt = state.target[state.level][opt.name] - 1
-    if amt >= opt.min then
-      state.target[state.level][opt.name] = amt
-    end
-  end
+  setStateRelative(opt, -1)
 end
 function back()
   local crs = state.cursor - 1
@@ -387,12 +391,12 @@ function control()
     -- Emergency stop sets the stop level, building RPM instead of RF
     if t.getEnergyStored() > e_stopLimit then
       e_stop = true
-      state.active = 2
+      setStateRelative(options[1], 2)
     end
     -- Switch to coast to bleed off RF
     if e_stop and t.getEnergyStored() == 0 then
       e_stop = false
-      state.active = 3
+      setStateRelative(options[1], 3)
     end
 
     display()

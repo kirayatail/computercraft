@@ -1,4 +1,4 @@
--- 10
+-- 11
 local version = 10
 local Table = nil
 local socket = nil
@@ -65,10 +65,10 @@ local function init()
     shell.run('installer lib/table.lua')
   end
   Table = require('lib/table')
-  if not fs.exists('websocket.lua') then
-    shell.run('installer websocket.lua')
+  if not fs.exists('lib/websocket.lua') then
+    shell.run('installer lib/websocket.lua')
   end
-  socket = require('websocket')
+  socket = require('lib/websocket')
 
   if not fs.exists(configPath) then
     local file = fs.open(configPath, 'w')
