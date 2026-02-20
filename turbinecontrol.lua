@@ -1,4 +1,4 @@
--- 19
+-- 20
 local t = nil
 local state = {}
 local socket = nil
@@ -146,6 +146,12 @@ function sendMethods()
       end
     }})
   end
+end
+
+function setPower(level)
+  state.active = level
+  writeState()
+  sendMethods()
 end
 
 function setStateRelative(option, diff)
@@ -391,12 +397,12 @@ function control()
     -- Emergency stop sets the stop level, building RPM instead of RF
     if t.getEnergyStored() > e_stopLimit then
       e_stop = true
-      setStateRelative(options[1], 2)
+      setPower(2)
     end
     -- Switch to coast to bleed off RF
     if e_stop and t.getEnergyStored() == 0 then
       e_stop = false
-      setStateRelative(options[1], 3)
+      setPower(3)
     end
 
     display()
