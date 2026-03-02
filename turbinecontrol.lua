@@ -1,4 +1,4 @@
--- 20
+-- 21
 local t = nil
 local state = {}
 local socket = nil
@@ -237,6 +237,7 @@ function keyListener()
     if key == keys.enter and socket then
       if not socket.isConnected() then
         socket.connect('turbine', true)
+        sendMethods()
       else
         socket.disconnect()
       end

@@ -1,22 +1,10 @@
--- 6
+-- 7
 local socket = nil
 local Table = nil
 local conf = {}
 local total = 0
-
-local function map(tbl, f)
-  local t = {}
-  for k, v in pairs(tbl) do
-    t[k] = f(v)
-  end
-  return t
-end
-
-local function sum(tbl)
-  Table.reduce(tbl, function(a, b)
-    return a + b
-  end)
-end
+local bats = {peripheral.find('thermalexpansion:storage_cell')}
+local previous = 0
 
 function init()
   if not fs.exists('lib/table.lua') then
@@ -41,17 +29,20 @@ function init()
   end
 end
 
+local function sum(tbl)
+  Table.reduce(tbl, function(a, b)
+    return a + b
+  end)
+end
+
 function start()
   if socket then
-    socket.group(conf.group or nil)
-    socket.hidden(conf.hidden or false)
-    socket.connect('batmon', true)
+    socket.connect('Big battery', true)
   end
 end
 
 function monitor()
   while true do
-    local bats = {peripheral.find('thermalexpansion:storage_cell')}
     local stored = sum(Table.map(bats, function(b)
       return b.getRFStored()
     end)) / 1000
@@ -60,19 +51,25 @@ function monitor()
     end)) / 1000
     if socket then
       socket.info({{
-        key = 'stored',
+        key = 'level',
+        name = 'Battery Level',
         value = stored,
-        type = 'number'
+        type = 'progress',
+        min = 0,
+        max = total
       }, {
-        key = 'total',
-        value = total,
-        type = 'number'
+        key = 'increasing',
+        name = 'Increasing',
+        value = stored > previous,
+        type = 'boolean'
       }, {
-        key = 'percent',
-        value = total > 0 and (stored * 100 / total) or 0,
-        type = 'number'
+        key = 'decreasing',
+        name = 'Decreasing',
+        value = stored < previous,
+        type = 'boolean'
       }})
     end
+    previous = stored
     sleep(1)
   end
 end
