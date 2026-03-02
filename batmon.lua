@@ -1,4 +1,4 @@
--- 7
+-- 8
 local socket = nil
 local Table = nil
 local conf = {}
@@ -25,7 +25,7 @@ function init()
     file.close()
   end
   if fs.exists('lib/websocket.lua') then
-    socket = require('websocket')
+    socket = require('lib/websocket')
   end
 end
 
