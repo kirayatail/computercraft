@@ -1,5 +1,5 @@
--- 21
-local t = nil
+-- 22
+local t = peripheral.find('BigReactors-Turbine')
 local state = {}
 local socket = nil
 local active = {'shutdown', 'stop', 'coast', 'online'}
@@ -7,6 +7,7 @@ local actFlow = nil
 local targetFlow = 0
 local e_stop = false
 local e_stopLimit = 800000
+peripheral.find('modem', rednet.open)
 
 local function indexOf(tbl, val)
   local index = {}
@@ -54,24 +55,12 @@ function init()
     }
     writeState()
   end
-  if state.portSide == nil then
-    setPortSide()
-  end
-  t = peripheral.wrap(state.portSide)
   actFlow = t.getFluidFlowRateMax()
 
   if not fs.exists('lib/websocket.lua') then
     shell.run('installer lib/websocket.lua')
   end
   socket = require('lib/websocket');
-end
-
-function setPortSide()
-  term.clear()
-  print('Which side is the port on?')
-  state.portSide = read()
-  writeState()
-  term.clear()
 end
 
 function setLevel(l)
@@ -218,30 +207,37 @@ end
 
 function keyListener()
   while true do
-    local event, key = os.pullEvent('key')
-    if key <= keys.nine and key >= keys.one then
-      setLevel(key - keys.one + 1)
-    end
-    if key == keys.up then
-      increase()
-    end
-    if key == keys.down then
-      decrease()
-    end
-    if key == keys.left then
-      back()
-    end
-    if key == keys.right then
-      forward()
-    end
-    if key == keys.enter and socket then
-      if not socket.isConnected() then
-        socket.connect('turbine', true)
-        sendMethods()
-      else
-        socket.disconnect()
+    local event, key, payload = os.pullEvent()
+    if event == 'key' then
+      if key <= keys.nine and key >= keys.one then
+        setLevel(key - keys.one + 1)
+      end
+      if key == keys.up then
+        increase()
+      end
+      if key == keys.down then
+        decrease()
+      end
+      if key == keys.left then
+        back()
+      end
+      if key == keys.right then
+        forward()
+      end
+      if key == keys.enter and socket then
+        if not socket.isConnected() then
+          socket.connect('turbine', true)
+          sendMethods()
+        else
+          socket.disconnect()
+        end
       end
     end
+    if event == 'rednet_message' then
+      local parsed = textutils.unserialise(payload)
+      state.active = parsed.active or state.active
+    end
+    sendMethods()
     writeState()
     display()
   end
@@ -413,11 +409,8 @@ end
 
 function flowUpdate()
   while true do
-    if actFlow < targetFlow and actFlow < 2000 then
-      actFlow = actFlow + 1
-    elseif actFlow > targetFlow and actFlow > 0 then
-      actFlow = actFlow - 1
-    end
+    local diff = math.max(-10, math.min(10, targetFlow - actFlow))
+    actFlow = actFlow + diff
     t.setFluidFlowRateMax(actFlow)
     sleep(0.15)
   end
